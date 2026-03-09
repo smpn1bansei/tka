@@ -261,25 +261,27 @@
                 // Cek jika kolom adalah Foto (mendeteksi kata "foto" secara umum)
                 if (key.toLowerCase().includes('foto')) {
                     if (value && value.trim() !== '') {
-                        // Ekstrak ID dari URL Google Drive
-                        // Cth: https://drive.google.com/file/d/1f3bQQpRvWBKcMyF8P7BKgIPOPpfi3ZjY/view
-                        const matchId = value.match(/\/d\/(.+?)\//);
-                        if (matchId && matchId[1]) {
-                            const fileId = matchId[1];
-                            const imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                        // Ekstrak ID dari URL Google Drive menggunakan Regex yang lebih kuat (mengambil ID sepanjang 25+ karakter)
+                        const matchId = value.match(/[-\w]{25,}/);
+                        if (matchId && matchId[0]) {
+                            const fileId = matchId[0];
+                            // Menggunakan endpoint thumbnail yang lebih stabil dari pemblokiran Google
+                            const imageUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w500`;
                             
                             fotoHtml = `
-                            <div class="sm:col-span-2 flex justify-center mb-4">
+                            <div class="sm:col-span-2 flex flex-col items-center justify-center mb-6">
                                 <div class="relative">
+                                    <!-- Jika foto gagal dimuat (misal karena di-private), akan fallback ke inisial nama -->
                                     <img src="${imageUrl}" alt="Foto Profil" class="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-full border-4 border-blue-100 shadow-md bg-gray-50" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(data['Nama Lengkap'] || 'Siswa')}&background=EBF5FF&color=1E3A8A&size=150';">
                                 </div>
+                                <a href="${value}" target="_blank" class="mt-3 text-sm text-blue-500 hover:text-blue-700 underline no-print"><i class="fas fa-external-link-alt"></i> Buka Foto Asli</a>
                             </div>
                             `;
                         } else {
                             // Jika format URL tidak dikenali tapi ada isinya
                             fotoHtml = `
                             <div class="sm:col-span-2 flex justify-center mb-4">
-                                <a href="${value}" target="_blank" class="text-blue-500 underline text-sm"><i class="fas fa-external-link-alt"></i> Lihat Foto Profil</a>
+                                <a href="${value}" target="_blank" class="text-blue-500 underline text-sm no-print"><i class="fas fa-external-link-alt"></i> Lihat Foto Profil</a>
                             </div>`;
                         }
                     }
