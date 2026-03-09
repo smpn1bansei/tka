@@ -69,10 +69,16 @@
                         placeholder="Masukkan NISN atau Nama Lengkap..."
                         onkeypress="handleKeyPress(event)">
                 </div>
-                <button onclick="searchData()" id="searchBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 whitespace-nowrap" disabled>
-                    <i class="fas fa-spinner fa-spin hidden" id="loadingIcon"></i>
-                    <span id="btnText">Tunggu Data...</span>
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="searchData()" id="searchBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 whitespace-nowrap flex-grow sm:flex-grow-0" disabled>
+                        <i class="fas fa-spinner fa-spin hidden" id="loadingIcon"></i>
+                        <span id="btnText">Cari Data</span>
+                    </button>
+                    <!-- Tombol Reset Ditambahkan -->
+                    <button onclick="resetSearch()" id="resetBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 whitespace-nowrap border border-gray-300" title="Reset Pencarian">
+                        <i class="fas fa-undo"></i> <span class="hidden sm:inline">Reset</span>
+                    </button>
+                </div>
             </div>
             <p id="statusText" class="text-sm text-gray-500 mt-3 text-center sm:text-left">
                 <i class="fas fa-circle-notch fa-spin mr-1"></i> Sedang menghubungkan ke database...
@@ -161,6 +167,16 @@
             }
         }
 
+        // Fungsi untuk mereset pencarian dan UI
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('hidden');
+            document.getElementById('errorContainer').classList.add('hidden');
+            document.getElementById('searchInput').focus();
+        }
+
         // Fungsi utama untuk mencari data
         function searchData() {
             const queryInput = document.getElementById('searchInput').value.trim();
@@ -235,14 +251,46 @@
         // Fungsi untuk merender detail kartu biodata dan nilai
         function renderDetail(data) {
             let html = '';
+            let fotoHtml = ''; // Pisahkan foto agar bisa ditaruh di atas
             
             // Loop melalui semua kolom di database CSV secara dinamis
             for (const [key, value] of Object.entries(data)) {
                 // Abaikan jika nama kolom kosong
                 if (!key || key.trim() === '') continue;
 
-                // Sorotan khusus (Highlight) untuk kolom Nama atau Nilai TKA jika ada
-                let isHighlight = key.toLowerCase().includes('nama lengkap') || key.toLowerCase().includes('tka');
+                // Cek jika kolom adalah Foto Profil
+                if (key.toLowerCase().includes('foto profil')) {
+                    if (value && value.trim() !== '') {
+                        // Ekstrak ID dari URL Google Drive
+                        // Cth: https://drive.google.com/file/d/1f3bQQpRvWBKcMyF8P7BKgIPOPpfi3ZjY/view
+                        const matchId = value.match(/\/d\/(.+?)\//);
+                        if (matchId && matchId[1]) {
+                            const fileId = matchId[1];
+                            const imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                            
+                            fotoHtml = `
+                            <div class="sm:col-span-2 flex justify-center mb-4">
+                                <div class="relative">
+                                    <img src="${imageUrl}" alt="Foto Profil" class="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-full border-4 border-blue-100 shadow-md bg-gray-50" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(data['Nama Lengkap'] || 'Siswa')}&background=EBF5FF&color=1E3A8A&size=150';">
+                                </div>
+                            </div>
+                            `;
+                        } else {
+                            // Jika format URL tidak dikenali tapi ada isinya
+                            fotoHtml = `
+                            <div class="sm:col-span-2 flex justify-center mb-4">
+                                <a href="${value}" target="_blank" class="text-blue-500 underline text-sm"><i class="fas fa-external-link-alt"></i> Lihat Foto Profil</a>
+                            </div>`;
+                        }
+                    }
+                    continue; // Lanjut ke kolom berikutnya, jangan render foto sebagai teks biasa
+                }
+
+                // Sorotan khusus (Highlight) untuk kolom Nama atau yang mengandung kata "TKA", "Matematika", "Bahasa Indonesia"
+                let isHighlight = key.toLowerCase().includes('nama lengkap') || 
+                                  key.toLowerCase().includes('tka') ||
+                                  key.toLowerCase().includes('matematika') ||
+                                  key.toLowerCase().includes('bahasa indonesia');
                 
                 html += `
                 <div class="border-b border-gray-100 pb-3 ${isHighlight ? 'sm:col-span-2 bg-blue-50/50 p-3 rounded-lg border-none' : ''}">
@@ -254,7 +302,8 @@
                 `;
             }
 
-            document.getElementById('detailContent').innerHTML = html;
+            // Gabungkan foto (di atas) dengan data teks (di bawah)
+            document.getElementById('detailContent').innerHTML = fotoHtml + html;
             
             document.getElementById('resultContainer').classList.remove('hidden');
             document.getElementById('listView').classList.add('hidden');
