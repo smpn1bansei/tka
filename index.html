@@ -258,8 +258,8 @@
                 // Abaikan jika nama kolom kosong
                 if (!key || key.trim() === '') continue;
 
-                // Cek jika kolom adalah Foto Profil
-                if (key.toLowerCase().includes('foto profil')) {
+                // Cek jika kolom adalah Foto (mendeteksi kata "foto" secara umum)
+                if (key.toLowerCase().includes('foto')) {
                     if (value && value.trim() !== '') {
                         // Ekstrak ID dari URL Google Drive
                         // Cth: https://drive.google.com/file/d/1f3bQQpRvWBKcMyF8P7BKgIPOPpfi3ZjY/view
