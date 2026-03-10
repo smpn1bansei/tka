@@ -302,16 +302,41 @@
                     displayKey = 'Gladi Bahasa Indonesia';
                 }
 
-                // Pengaturan warna teks berdasarkan nilai
+                // Pengaturan nilai yang akan ditampilkan
                 let valueStr = value && value.trim() !== '' ? value.trim() : '';
+
+                // --- SENSOR NAMA ORANG TUA ---
+                let keyLower = key.toLowerCase();
+                let isParentName = keyLower.includes('ibu') || 
+                                   keyLower.includes('ayah') || 
+                                   keyLower.includes('orang tua') || 
+                                   keyLower.includes('wali');
+                
+                if (isParentName && valueStr !== '') {
+                    let censored = '';
+                    let charIndex = 0; // Menghitung hanya huruf/karakter (bukan spasi) agar selang-seling konsisten
+                    for (let i = 0; i < valueStr.length; i++) {
+                        if (valueStr[i] === ' ') {
+                            censored += ' ';
+                        } else {
+                            // Mengganti huruf/karakter ganjil (berdasarkan urutan hitungan) dengan *
+                            censored += (charIndex % 2 !== 0) ? '*' : valueStr[i];
+                            charIndex++;
+                        }
+                    }
+                    valueStr = censored;
+                }
+                // --- AKHIR SENSOR NAMA ---
+
+                // Pengaturan warna teks berdasarkan nilai
                 let valueClass = isHighlight ? 'text-lg font-bold text-gray-900' : 'text-gray-800 font-medium';
                 
                 if (valueStr.toLowerCase() === 'berhasil') {
                     valueClass = 'font-bold text-blue-600 ' + (isHighlight ? 'text-lg' : 'text-base');
                 } else if (valueStr.toLowerCase() === 'gagal') {
                     valueClass = 'font-bold text-red-600 ' + (isHighlight ? 'text-lg' : 'text-base');
-                } else if (valueStr !== '' && !isNaN(valueStr)) {
-                    // Jika nilai berupa angka
+                } else if (valueStr !== '' && !isNaN(valueStr) && !isParentName) {
+                    // Jika nilai berupa angka (dan bukan nama orang tua yg mungkin berupa angka identitas)
                     valueClass = 'font-bold text-black ' + (isHighlight ? 'text-lg' : 'text-base');
                 }
 
