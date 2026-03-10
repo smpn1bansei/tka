@@ -48,7 +48,7 @@
             <div class="flex justify-center mb-3">
                 <i class="fas fa-graduation-cap text-4xl text-yellow-300"></i>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold mb-2">Pengecekan Biodata & Nilai TKA</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2">Cek Biodata & Nilai TKA</h1>
             <h2 class="text-lg sm:text-xl font-medium text-blue-100">SMP Negeri 1 Bandar Seikijang</h2>
             <p class="text-sm mt-3 text-blue-200">Silakan masukkan NISN atau Nama Lengkap untuk melihat data Anda.</p>
         </div>
@@ -130,7 +130,7 @@
 
     <!-- Footer -->
     <footer class="mt-auto py-6 text-center text-gray-500 text-sm no-print">
-        <p>&copy; 2024 SMP Negeri 1 Bandar Seikijang. All rights reserved.</p>
+        <p>&copy; 2026 SMP Negeri 1 Bandar Seikijang. All rights reserved.</p>
     </footer>
 
     <script>
@@ -294,11 +294,32 @@
                                   key.toLowerCase().includes('matematika') ||
                                   key.toLowerCase().includes('bahasa indonesia');
                 
+                // Mengubah label UI untuk Matematika dan Bahasa Indonesia
+                let displayKey = key;
+                if (key.trim().toLowerCase() === 'matematika') {
+                    displayKey = 'Gladi Matematika';
+                } else if (key.trim().toLowerCase() === 'bahasa indonesia') {
+                    displayKey = 'Gladi Bahasa Indonesia';
+                }
+
+                // Pengaturan warna teks berdasarkan nilai
+                let valueStr = value && value.trim() !== '' ? value.trim() : '';
+                let valueClass = isHighlight ? 'text-lg font-bold text-gray-900' : 'text-gray-800 font-medium';
+                
+                if (valueStr.toLowerCase() === 'berhasil') {
+                    valueClass = 'font-bold text-blue-600 ' + (isHighlight ? 'text-lg' : 'text-base');
+                } else if (valueStr.toLowerCase() === 'gagal') {
+                    valueClass = 'font-bold text-red-600 ' + (isHighlight ? 'text-lg' : 'text-base');
+                } else if (valueStr !== '' && !isNaN(valueStr)) {
+                    // Jika nilai berupa angka
+                    valueClass = 'font-bold text-black ' + (isHighlight ? 'text-lg' : 'text-base');
+                }
+
                 html += `
                 <div class="border-b border-gray-100 pb-3 ${isHighlight ? 'sm:col-span-2 bg-blue-50/50 p-3 rounded-lg border-none' : ''}">
-                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">${key}</p>
-                    <p class="${isHighlight ? 'text-lg font-bold text-gray-900' : 'text-gray-800 font-medium'}">
-                        ${value && value.trim() !== '' ? value : '<span class="text-gray-400 italic">Kosong</span>'}
+                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">${displayKey}</p>
+                    <p class="${valueClass}">
+                        ${valueStr !== '' ? valueStr : '<span class="text-gray-400 italic">Kosong</span>'}
                     </p>
                 </div>
                 `;
