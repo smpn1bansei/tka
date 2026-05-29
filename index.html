@@ -263,6 +263,12 @@
             
             const bin = data['BIN'] || '';
             const kat_bin = data['Kat_BIN'] || '-';
+
+            // Penambahan variabel untuk Jumlah Nilai, Rata-rata, dan Peringkat
+            // Pastikan nama header (baris pertama) di Google Sheets sesuai (huruf besar/kecil berpengaruh)
+            const jumlah_nilai = data['Jumlah Nilai'] || data['Jumlah'] || data['JUMLAH NILAI'] || '-';
+            const rata_rata = data['Rata-rata'] || data['Rata Rata'] || data['Rata_Rata'] || '-';
+            const peringkat = data['Peringkat'] || data['Ranking'] || data['PERINGKAT'] || '-';
             
             const fotoUrlRaw = data['FOTO'] || '';
 
@@ -358,6 +364,29 @@
                         </div>
 
                     </div>
+
+                    <!-- Penambahan Area Rekapitulasi (Jumlah, Rata-rata, Peringkat) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                        <!-- Kotak Jumlah Nilai -->
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center shadow-sm">
+                            <p class="text-xs text-indigo-600 uppercase font-bold tracking-wider mb-1">Jumlah Nilai</p>
+                            <p class="text-2xl font-bold text-gray-800">${jumlah_nilai}</p>
+                        </div>
+                        
+                        <!-- Kotak Rata-rata -->
+                        <div class="bg-teal-50 border border-teal-100 rounded-xl p-4 text-center shadow-sm">
+                            <p class="text-xs text-teal-600 uppercase font-bold tracking-wider mb-1">Rata-rata</p>
+                            <p class="text-2xl font-bold text-gray-800">${rata_rata}</p>
+                        </div>
+                        
+                        <!-- Kotak Peringkat -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center shadow-sm relative overflow-hidden">
+                            <i class="fas fa-trophy absolute -bottom-2 -right-2 text-5xl text-amber-100 opacity-50"></i>
+                            <p class="text-xs text-amber-700 uppercase font-bold tracking-wider mb-1 relative z-10">Peringkat</p>
+                            <p class="text-2xl font-bold text-gray-900 relative z-10">Ke-${peringkat}</p>
+                        </div>
+                    </div>
+
                 </div>
             `;
 
